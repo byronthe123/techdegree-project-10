@@ -53,22 +53,12 @@ export default {
 
     getCourses: async () => {
         const response = await api(`/courses`, 'GET', null, false, null);
-        if (response.status === 200) {
-          return response.json().then(data => data);
-        }
-        else {
-          throw new Error();
-        }
+        return response;
     },
 
     getCourse: async (id) => {
         const response = await api(`/courses/${id}`, 'GET', null, false, null);
-        if (response.status === 200) {
-          return response.json().then(data => data);
-        }
-        else {
-          throw new Error();
-        }
+        return response;
     },
 
     updateCourse: async (user, id, title, description, estimatedTime, materialsNeeded) => {

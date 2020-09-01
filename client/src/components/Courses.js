@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from 'react';
 
-export default ({ context  }) => {
+export default ({ context, history  }) => {
+
+  const [courses, setCourses] = useState([]);
 
   // Get all courses on page load:
   useEffect(() => {
-    context.actions.getCourses();
-  }, []);
+    const getCourses = async () => {
+      const response = await context.actions.getCourses();
+      if (response.status !== 200) {
+        history.push('/error');
+      } else {
+        response.json().then(data => setCourses(data));
+      }
+    }
+    getCourses();
+  }, [context.actions, history]);
 
   return (
     <div className="bounds">
         {
-            context.courses.map((c, i) => 
+            courses.map((c, i) => 
                 <div className='grid-33' key={i}>
                     <a className='course--module course--link' href={`/courses/${c.id}`}>
                         <h4 className='course--label'>Course</h4>

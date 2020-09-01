@@ -8,19 +8,22 @@ export default ({ context, match, history  }) => {
     // Get the course data on page load:
     useEffect(() => {
         const getCourse = async () => {
-            const course = await context.actions.getCourse(match.params.id);
-            console.log(course);
-            setCourse(course);
+            const response = await context.actions.getCourse(match.params.id);
+            if (response.status !== 200) {
+                history.push('/error');
+            } else {
+                response.json().then(data => setCourse(data));
+            }
         }
         getCourse();
-    }, []);
+    }, [context.actions, history, match.params.id]);
 
     // If no course is found, redirect the user to the "notFound" route:
     useEffect(() => {
         if (!course) {
             history.push('/notfound ');
         }
-    }, [course]);
+    }, [course, history]);
 
     const { authenticatedUser } = context;
 

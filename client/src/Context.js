@@ -7,8 +7,6 @@ const Context = React.createContext();
 export const Provider = (props) => {
 
     const [authenticatedUser, setAuthenticatedUser] = useState(Cookies.getJSON('authenticatedUser') || null);
-    const [courses, setCourses] = useState([]);
-    const [course, setCourse] = useState(null);
     const [errors, setErrors] = useState([]);
 
     const signIn = async (username, password) => {
@@ -30,14 +28,13 @@ export const Provider = (props) => {
     }
 
     const getCourses = async () => {
-        const courses = await data.getCourses();
-        setCourses(courses);
+        const response = await data.getCourses();
+        return response;
     }
 
     const getCourse = async (id) => {
-        const course = await data.getCourse(id);
-        setCourse(course);
-        return course;
+        const response = await data.getCourse(id);
+        return response;
     }
 
     const updateCourse = async (id, title, description, estimatedTime, materialsNeeded) => {
@@ -58,8 +55,6 @@ export const Provider = (props) => {
     return (
         <Context.Provider value={{
             authenticatedUser,
-            courses,
-            course,
             errors,
             data,
             actions: {

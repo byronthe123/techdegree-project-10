@@ -6,29 +6,30 @@ export default ({ context, match, history }) => {
 
     const [course, setCourse] = useState([]);
 
-    // Function to check if the user owns the course they are trying to edit:
-    const checkAuthorizedUser = (courseUserId) => {
-        if (context.authenticatedUser.id !== courseUserId) {
-            history.push('/forbidden');
-        }
-    }
-
     // Get the course data on page load:
     useEffect(() => {
         const getCourse = async () => {
-            const course = await context.actions.getCourse(match.params.id);
-            checkAuthorizedUser(course.userId);
-            setCourse(course);
+            const response = await context.actions.getCourse(match.params.id);
+            if (response.status !== 200) {
+                history.push('/error');
+            } else {
+                response.json().then(data => {
+                    if (context.authenticatedUser.id !== data.userId) {
+                        history.push('/forbidden');
+                    }
+                    setCourse(data);
+                });
+            }
         }
         getCourse();
-    }, []);
+    }, [context.authenticatedUser.id , context.actions, history, match.params.id]);
 
     // If the course is not found, redirect to notFound:
     useEffect(() => {
         if (!course) {
             history.push('/notfound ');
         }
-    }, [course]);
+    }, [course, history]);
 
     // Use useState to store the values for updating the course:
     const [title, setTitle] = useState('');
@@ -39,14 +40,14 @@ export default ({ context, match, history }) => {
 
     // Set initial values using the course data:
     useEffect(() => {
-        if (context.course) {
-            const { title, description, materialsNeeded, estimatedTime } = context.course;
-            setTitle(title);
-            setDescription(description);
+        if (course) {
+            const { title, description, materialsNeeded, estimatedTime } = course;
+            setTitle(title ? title : '');
+            setDescription(description ? description : '');
             setMaterialsNeeded(materialsNeeded ? materialsNeeded : '');
             setEstimatedTime(estimatedTime ? estimatedTime : '');
         }
-    }, [context.course]);
+    }, [course]);
 
     // Update the course using context:
     const handleUpdate = async (e) => {
@@ -91,7 +92,10 @@ export default ({ context, match, history }) => {
                                     <div>
                                         <input id="title" name="title" type="text" className="input-title course--title--input" placeholder="Course title..." value={title} onChange={(e) => setTitle(e.target.value)} />
                                     </div>
-                                    <p>By</p>
+                                    {
+                                        course && course.User && 
+                                        <p>By {course.User.firstName} {course.User.lastName}</p>
+                                    }                                
                                 </div>
                                 <div className="course--description">
                                     <div>
