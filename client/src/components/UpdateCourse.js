@@ -14,15 +14,17 @@ export default ({ context, match, history }) => {
                 history.push('/error');
             } else {
                 response.json().then(data => {
-                    if (context.authenticatedUser.id !== data.userId) {
-                        history.push('/forbidden');
+                    if (context && context.authenticatedUser && context.authenticatedUser.id && data && data.userId) {
+                        if (context.authenticatedUser.id !== data.userId) {
+                            history.push('/forbidden');
+                        }
                     }
                     setCourse(data);
                 });
             }
         }
         getCourse();
-    }, [context.authenticatedUser.id , context.actions, history, match.params.id]);
+    }, [context, history, match.params.id]);
 
     // If the course is not found, redirect to notFound:
     useEffect(() => {
